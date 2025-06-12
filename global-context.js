@@ -1,22 +1,25 @@
-
-import { createContext, useMemo, useContext, useState, useEffect } from 'react'
+import { createContext, useMemo, useContext, useState } from 'react'
 import { useLocale } from "next-intl";
 
 const GlobalContext = createContext(null)
 
 export const GlobalProvider = ({ initialLocales, children }) => {
   const localeValue = useLocale()
-  const [locales, setLocales] = useState(initialLocales ?? [{"name":"English","short":"en"}])
-  const [locale, setLocale] = useState({"name":"English","short":"en"})
+  const [locales, setLocales] = useState(initialLocales ?? [
+    {"name":"Français","short":"fr"},
+    {"name":"English","short":"en"},
+    {"name":"Español","short":"es"},
+    {"name":"Deutsch","short":"de"}
+  ])
   
-  useEffect(() => {
-    if (!locales) {
-      return
+  // Initialiser l'état locale de manière cohérente entre serveur et client
+  const [locale, setLocale] = useState(() => {
+    if (!initialLocales || initialLocales.length === 0) {
+      return {"name":"Français","short":"fr"}
     }
-
-    const currentLangValue = locales.find((el) => el.short === localeValue)
-    setLocale(currentLangValue)
-  }, [locales])
+    const currentLangValue = initialLocales.find((el) => el.short === localeValue)
+    return currentLangValue || {"name":"Français","short":"fr"}
+  })
 
   const value = useMemo(() => {
     return {
